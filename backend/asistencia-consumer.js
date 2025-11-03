@@ -6,7 +6,7 @@ const EXCHANGE = "aula_exchange";
 const ROUTING_KEY = "asistencia.alerta";
 
 async function run() {
-  const connection = await amqp.connect();
+  const connection = await amqp.connect(RABBITMQ_URL);
   const channel = await connection.createChannel();
 
   await channel.assertExchange(EXCHANGE, "direct", { durable: false });

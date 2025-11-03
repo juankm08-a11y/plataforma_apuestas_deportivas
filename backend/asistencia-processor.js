@@ -1,4 +1,5 @@
 const { Kafka } = require("kafkajs");
+const amqp = require("amqp");
 
 const kafka = new Kafka({
   clientId: "asistencia-processor",
@@ -6,9 +7,11 @@ const kafka = new Kafka({
 });
 
 const consumer = kafka.consumewr({ groupId: "asistencia-processor" });
-const producer = kafka.producer();
-const zoneBuffers = new Map();
 
+const RABBITMQ_URL = "amqp://192.168.80.1";
+
+const EXCHANGE = "aula_exchange";
+const ROUTING_KEY = "asistencia.alerta";
 async function run() {
   await consumer.connect();
   await producer.connect();
