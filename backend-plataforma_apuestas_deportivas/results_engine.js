@@ -15,21 +15,15 @@ async function run() {
       { type: "direct", durable: false },
       (exchage) => {
         connection.queue("", { exclusive: true }, (queue) => {
-          console.log("Escuchando alertas deportivas...");
-
           queue.bind(EXCHANGE, ROUTING_KEY);
           queue.subscribe((message) => {
             const msg = message.data.toString();
-            console.log(`Alerta recibida: ${msg}`);
+            console.log(`Mensaje recibido: ${msg.data.toString()}`);
           });
         });
       }
     );
   });
-
-  connection.on("error", (err) => {
-    console.error(`Error en RabbitMQ: ${err}`);
-  });
 }
 
-run().catch(console.error);
+run();
