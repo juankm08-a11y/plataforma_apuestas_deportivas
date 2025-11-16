@@ -14,26 +14,24 @@ async function run() {
   const connection = amqp.createConnection({ url: RABBITMQ_URL });
 
   connection.on("ready", () => {
-    alert("Connectado a RabbitMQ");
+    console.log("Connectado a RabbitMQ");
 
     connection.queue("match_simulator_queue", { durable: true }, (queue) => {
-      alert("Esperando mensajes de partidos...");
-
       queue.bind("match_exchange", "match_simulator");
-      queue.subscribe(async (message) => {
-        const data = message.data.toString();
-        const parsed = JSON.parse(data);
+      console.log("Esperando mensajes...");
 
-        const winner = Math.random() > 0.5 ? "TeamA" : "TeamB";
+      queue.subscribe(async (message) => {
+        const data = JSON.parse(message.data.toString());
+
+        const winner = Math.random() > 0.5 ? "Team A" : "Team B";
+
         const event = {
           event_type: "MATCH_FINISHED",
-          match_id: parsed.match_id,
+          match_id: data.match_id,
           winner,
         };
 
-        console.log(
-          `Partido finalizado ${data.match_id} finalizado. Ganador: ${winner} `
-        );
+        console.log(`Termina partido ${data.match_id} =>  Ganador: ${winner} `);
 
         await producer.send({
           topic: "match_events",
