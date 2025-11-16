@@ -1,4 +1,5 @@
 const { Kafka } = require("kafkajs");
+const amqp = require("amqp");
 
 const kafka = new Kafka({
   clientId: "match-simulator",
@@ -6,6 +7,7 @@ const kafka = new Kafka({
 });
 
 const producer = kafka.producer();
+
 const RABBITMQ_URL = "amqp://guest:guest@rabbitmq";
 
 async function run() {
@@ -16,28 +18,42 @@ async function run() {
   connection.on("ready", () => {
     console.log("Connectado a RabbitMQ");
 
-    connection.queue("match_simulator_queue", { durable: true }, (queue) => {
-      queue.bind("match_exchange", "match_simulator");
-      console.log("Esperando mensajes...");
+    connection.queue("alertas inmediatas", { durable: true }, (queue) => {
+      console.log("Cola lista: alertas inmediatas");
 
-      queue.subscribe(async (message) => {
-        const data = JSON.parse(message.data.toString());
+      setInterval(async () => {
+        const matchId = "MATCH-001";
 
-        const winner = Math.random() > 0.5 ? "Team A" : "Team B";
-
-        const event = {
-          event_type: "MATCH_FINISHED",
-          match_id: data.match_id,
-          winner,
-        };
-
-        console.log(`Termina partido ${data.match_id} =>  Ganador: ${winner} `);
+        const oldOdds = parseFloat((Math.random() * 3).toFixed(2));
+        const newOdds = parseFloat((Math.random() * 3).toFixed(2));
 
         await producer.send({
           topic: "match_events",
-          messages: [{ key: parsed.match_id, value: JSON.stringify(event) }],
+          messages: [
+            {
+              key: matchId,
+              value: JSON.stringify({
+                type: "ODDS_UPDATED",
+                matchId,
+                newOdds,
+                timestamp: Date.now(),
+              }),
+            },
+          ],
         });
-      });
+
+        const alerta = {
+          type: "NUEVA_CUOTA",
+          matchId,
+          oldOdds,
+          newOdds,
+          change: (newOdds - oldOdds).toFixed(2),
+          timestamp: Date.now(),
+        };
+
+        queue.publish(alerta);
+        console.log("Alerta enviada: ", alerta);
+      }, 5000);
     });
   });
 
@@ -46,4 +62,4 @@ async function run() {
   });
 }
 
-run().catch(console.error);
+run().catch((err) => console.error("Error fatal: ", err));
