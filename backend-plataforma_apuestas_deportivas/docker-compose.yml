@@ -29,13 +29,7 @@ services:
 
     healthcheck:
       test:
-        [
-          "CMD",
-          "kafka-topics",
-          "--list",
-          "--bootstrap-server",
-          "localhost:9092",
-        ]
+        ["CMD", "kafka-topics", "--list", "--bootstrap-server", "kafka:9092"]
       interval: 10s
       timeout: 30s
       retries: 5
