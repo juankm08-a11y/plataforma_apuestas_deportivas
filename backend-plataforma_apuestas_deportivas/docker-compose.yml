@@ -54,8 +54,10 @@ services:
     build: .
     command: node betting_api.js
     depends_on:
-      - kafka
-      - rabbitmq
+      kafka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       KAFKA_BROKER: kafka:9092
       RABBITMQ_URL: amqp://guest:guest@rabbitmq
@@ -66,8 +68,10 @@ services:
     build: .
     command: node match_generator.js
     depends_on:
-      - kafka
-      - rabbitmq
+      kafka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       KAFKA_BROKER: kafka:9092
       RABBITMQ_URL: amqp://guest:guest@rabbitmq
@@ -76,8 +80,10 @@ services:
     build: .
     command: node match_simulator.js
     depends_on:
-      - kafka
-      - rabbitmq
+      kafka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       KAFKA_BROKER: kafka:9092
       RABBITMQ_URL: amqp://guest:guest@rabbitmq
@@ -86,8 +92,10 @@ services:
     build: .
     command: node results_engine.js
     depends_on:
-      - kafka
-      - rabbitmq
+      kafka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       KAFKA_BROKER: kafka:9092
       RABBITMQ_URL: amqp://guest:guest@rabbitmq
@@ -98,7 +106,10 @@ services:
     ports:
       - "8081:8081"
     depends_on:
-      - rabbitmq
+      kafka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       RABBITMQ_URL: amqp://guest:guest@rabbitmq
 
@@ -106,7 +117,10 @@ services:
     build: .
     command: node email_worker.js
     depends_on:
-      - rabbitmq
+      kafka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     environment:
       RABBITMQ_URL: amqp://guest:guest@rabbitmq
     restart: always
