@@ -3,7 +3,7 @@ const amqp = require("amqp");
 
 const kafka = new Kafka({
   clientId: "betting-api",
-  brokers: [process.env.KAFKA_BROKER || "kafka:9092"],
+  brokers: ["kafka:9092"],
 });
 
 const producer = kafka.producer();
