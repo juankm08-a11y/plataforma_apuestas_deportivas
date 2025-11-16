@@ -11,7 +11,7 @@ const RABBITMQ_URL = "amqp://guest:guest@rabbitMQ";
 const EXCHANGE = "betting_exchange";
 const ROUTING_KEY = "match.alert";
 
-async function conectRabbit() {
+async function connectRabbit() {
   return new Promise((resolve, reject) => {
     const connection = amqp.createConnection({ url: RABBITMQ_URL });
 
@@ -31,30 +31,7 @@ async function conectRabbit() {
 
 async function run() {
   await producer.connect();
-  rabbitChannel = await conectRabbit();
-
-  connection.exchange(
-    EXCHANGE,
-    { type: "direct", durable: false },
-    (exchange) => {
-      setInterval(async () => {
-        const matchId = `match_${Math.floor(Math.random() * 1000)}`;
-        const odds = (Math.random() * (2.5 - 1.1) + 1.1).toFixed(2);
-        const msg = { matchId, odds, timestamp: new Date().toISOString() };
-
-        await producer.send({
-          topic: "bettings_events",
-          messages: [{ key: matchId, value: JSON.stringify(msg) }],
-        });
-
-        console.log(`Evento de apuesta: ${JSON.stringify(msg)}`);
-
-        const alerta = `Nueva cuota disponible para ${matchId}:${odds}`;
-        exchange.publish("match.alert", Buffer.from(alerta));
-        console.log(`Alerta enviada a RabbitMQ ${alerta}`);
-      }, 4000);
-    }
-  );
+  const { exchange } = await conectRabbit;
 }
 
 run().catch(console.error);
