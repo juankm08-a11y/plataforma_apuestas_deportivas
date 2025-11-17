@@ -2,10 +2,14 @@ import { Component, OnDestroy, OnInit } from '@angular/core';
 import { Alert } from '../../models/alert.model';
 import { Subscription } from 'rxjs';
 import { AlertController } from '../../controllers/alert.controller';
+import {
+  CommonModule,
+  NgForOf,
+} from '../../../../node_modules/@angular/common/common_module.d-NEF7UaHr';
 
 @Component({
   selector: 'app-dashboard',
-  imports: [],
+  imports: [NgForOf, CommonModule],
   templateUrl: './dashboard.component.html',
   styleUrl: './dashboard.component.scss',
 })
