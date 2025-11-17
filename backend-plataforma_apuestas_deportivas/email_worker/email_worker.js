@@ -2,7 +2,7 @@ const amqp = require("amqp");
 
 const RABBITMQ_URL = "amqp://guest:guest@rabbitmq";
 const EXCHANGE = "betting_exchange";
-const ROUTING_KEY = "match.alerta";
+const ROUTING_KEY = "match.alert";
 
 async function run() {
   const connection = amqp.createConnection({ url: RABBITMQ_URL });
