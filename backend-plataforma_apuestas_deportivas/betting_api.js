@@ -41,27 +41,33 @@ async function connectRabbit() {
   });
 }
 
-async function run() {
+async () => {
   await producer.connect();
-  const { exchange } = await connectRabbit();
+  var { exchange } = await connectRabbit();
+};
 
-  setInterval(async () => {
-    const matchId = `match_${Math.floor(Math.random() * 1000)}`;
-    const odds = (Math.random() * (2.5 - 1.1) + 1.1).toFixed(2);
-    const msg = { matchId, odds, timestamp: new Date().toISOString() };
+app.post("/odds", async (req, res) => {
+  const { matchId, newOdds } = req.body;
 
-    await producer.send({
-      topic: "bettings_events",
-      messages: [{ key: matchId, value: JSON.stringify(msg) }],
-    });
+  if (!matchId || !newOdds)
+    return res.status(400).json({ error: "Datos incompletos" });
 
-    console.log(`Evento enviado a Kafka: ${JSON.stringify(msg)}`);
+  await db.query(
+    "INSERT INTO odds_history (match_id,odds,timestamp) VALUES (?,?,NOW())",
+    [matchId, newOdds]
+  );
 
-    const alerta = `Nueva cuota disponible para ${matchId}: ${odds}`;
-    exchange.publish(ROUTING_KEY, Buffer.from(alerta));
+  await producer.send({
+    topic: "bettings_events",
+    messages: [{ key: matchId, value: JSON.stringify({ matchId, newOdds }) }],
+  });
 
-    console.log(`Alerta enviada a RabbitMQ: ${alerta}`);
-  }, 4000);
-}
+  exchange.publish(
+    ROUTING_KEY,
+    Buffer.from(`Nueva cuota ${newOdds} para ${matchId}`)
+  );
 
-run().catch(console.error);
+  res.json({ message: "Cuota enviada correctamente" });
+});
+
+app.listen(8080, () => console.log("Betting api escuchando en el puerto 8080"));
