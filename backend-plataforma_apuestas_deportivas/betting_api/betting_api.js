@@ -39,6 +39,8 @@ const RABBITMQ_URL = "amqp://guest:guest@rabbitMQ";
 const EXCHANGE = "betting_exchange";
 const ROUTING_KEY = "match.alert";
 
+let exchangeGlobal = null;
+
 async function connectRabbit() {
   return new Promise((resolve, reject) => {
     const connection = amqp.createConnection({ url: RABBITMQ_URL });
