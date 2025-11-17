@@ -1,11 +1,23 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
+import { Match } from '../../models/match.model';
+import { MatchController } from '../../controllers/match.controller';
 
 @Component({
   selector: 'app-matches',
   imports: [],
   templateUrl: './matches.component.html',
-  styleUrl: './matches.component.scss'
+  styleUrl: './matches.component.scss',
 })
-export class MatchesComponent {
+export class MatchesComponent implements OnInit {
+  matches: Match[] = [];
 
+  constructor(private matchCtrl: MatchController) {}
+
+  ngOnInit() {
+    this.loadMatches();
+  }
+
+  loadMatches() {
+    this.matchCtrl.getMatches().subscribe((data) => (this.matches = data));
+  }
 }
