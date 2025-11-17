@@ -67,26 +67,6 @@ services:
     ports:
       - "8080:8080"
 
-  match_generator:
-    build: .
-    command: node match_generator.js
-    depends_on:
-      - kafka
-      - rabbitmq
-    environment:
-      KAFKA_BROKER: kafka:9092
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq
-
-  match_simulator:
-    build: .
-    command: node match_simulator.js
-    depends_on:
-      - kafka
-      - rabbitmq
-    environment:
-      KAFKA_BROKER: kafka:9092
-      RABBITMQ_URL: amqp://guest:guest@rabbitmq
-
   results_engine:
     build: .
     command: node results_engine.js
