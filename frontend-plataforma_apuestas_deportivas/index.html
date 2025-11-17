@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <title>Plataforma de Apuestas</title>
+  </head>
+  <body>
+    <h1>Partidos</h1>
+    <ul id="matches"></ul>
+    <script>
+      async function loadMatches() {
+        const res = await fetch("/matches");
+        const matches = await res.json();
+        const list = document.getElementById("matches");
+        list.innerHTML = "";
+        matches.forEach((m) => {
+          const li = document.createElement("li");
+          li.textContent = `${m.homeTeam} vs ${m.awayTeam} - Inicio: ${m.startAt}`;
+          list.appendChild(li);
+        });
+      }
+
+      loadMatches();
+    </script>
+  </body>
+</html>
