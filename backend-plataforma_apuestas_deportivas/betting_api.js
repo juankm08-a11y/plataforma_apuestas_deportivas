@@ -12,6 +12,13 @@ const kafka = new Kafka({
 });
 
 const producer = kafka.producer();
+
+const db = await mysql.createPool({
+  host: "mysql",
+  user: "root",
+  password: "apuestas_deportivas",
+});
+
 const RABBITMQ_URL = "amqp://guest:guest@rabbitMQ";
 const EXCHANGE = "betting_exchange";
 const ROUTING_KEY = "match.alert";
