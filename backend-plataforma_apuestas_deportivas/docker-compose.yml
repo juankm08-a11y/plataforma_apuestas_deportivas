@@ -49,7 +49,7 @@ services:
       MYSQL_ROOT_PASSWORD: juan03
       MYSQL_DATABASE: apuestas_deportivas
     ports:
-      - "3306:3306"
+      - "3307:3306"
     volumes:
       - mysql_data:/var/lib/mysql
 
