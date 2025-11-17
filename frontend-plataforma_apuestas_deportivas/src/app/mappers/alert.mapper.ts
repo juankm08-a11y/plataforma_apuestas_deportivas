@@ -1,3 +1,4 @@
+import { AlertDTO } from '../dto/alert.dto';
 import { Alert } from '../models/alert.model';
 
 export class AlertMapper {
@@ -13,7 +14,15 @@ export class AlertMapper {
     } as Alert;
   }
 
-  static toApi(model: Alert) {
-    return model;
+  static toDTO(model: Alert): AlertDTO {
+    return {
+      id: model.id,
+      type: model.type,
+      matchId: model.matchId,
+      oldOdds: model.oldOdds,
+      newOdds: model.newOdds,
+      change: model.change,
+      timestamp: model.timestamp,
+    };
   }
 }
