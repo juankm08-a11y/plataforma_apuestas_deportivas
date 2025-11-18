@@ -90,7 +90,7 @@ const rabbitConn = connectRabbit();
 
 app.post("/api/set-odds", (req, res) => {
   const { match_id, team, odds } = req.body;
-  if (!match_id || !team || !odds === undefined)
+  if (!match_id || !team || odds === undefined)
     return res.status(400).json({ error: "Faltan datos" });
 
   if (!rabbitExchange) {
