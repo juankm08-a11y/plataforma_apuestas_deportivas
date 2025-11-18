@@ -1,4 +1,4 @@
-const ws = new WebSocket(`ws://${window.location.hostname}:8082`);
+const ws = new WebSocket(`wss://${window.location.hostname}:8081`);
 
 ws.onmessage = (event) => {
   const div = document.getElementById("alerts");
@@ -8,7 +8,7 @@ ws.onmessage = (event) => {
 };
 
 ws.onopen = () => {
-  console.log("Conectado a websocket");
+  console.log("Conectado a WebSocket seguro");
 };
 
 ws.onerror = (err) => {
