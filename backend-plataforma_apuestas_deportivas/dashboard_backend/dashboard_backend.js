@@ -17,6 +17,7 @@ const server = https.createServer(
 );
 
 app.use(cors());
+app.use(express.json());
 app.use(express.static(path.join(__dirname, "public")));
 
 const wss = new WebSocket.Server({ server });
@@ -56,8 +57,34 @@ async function connectRabbit() {
   }
 }
 
-app.get("/api/hello", (req, res) => {
-  res.json({ message: "Hola Mundo desde api con dockersql" });
+const rabbitConn = connectRabbit();
+
+// app.get("/api/hello", (req, res) => {
+//   res.json({ message: "Hola Mundo desde api con dockersql" });
+// });
+
+app.post("/api/set-odds", (req, res) => {
+  const { match_id, team, odds } = req.body;
+  if (!match_id || team || !odds)
+    return res.status(400).json({ error: "Faltan datos" });
+
+  const msg = JSON.stringify({
+    match_id,
+    team,
+    odds,
+    event_type: "ODDS_UPDATED",
+  });
+
+  rabbitConn.exchange(
+    EXCHANGE,
+    { key: "topic", durable: false },
+    (exchange) => {
+      exchange.publish(ROUTING_KEY, msg);
+    }
+  );
+
+  console.log("Cuota enviada: ", msg);
+  res.json({ status: "ok", data: msg });
 });
 
 app.get("/", (req, res) => {
