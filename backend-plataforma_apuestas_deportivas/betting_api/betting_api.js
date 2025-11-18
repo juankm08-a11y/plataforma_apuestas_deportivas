@@ -25,7 +25,7 @@ async function initDB() {
   await db.query(
     `
     CREATE TABLE IF NOT EXISTS odds_history (
-      id INT AUTO_INCREMENT, 
+      id INT AUTO_INCREMENT PRIMARY KEY, 
       match_id VARCHAR(50), 
       odds DECIMAL (5,2),
       timestamp DATETIME DEFAULT NOW()
