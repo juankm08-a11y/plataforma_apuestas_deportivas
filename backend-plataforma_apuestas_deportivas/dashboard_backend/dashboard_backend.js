@@ -1,12 +1,25 @@
+const fs = require("fs");
+const https = require("https");
 const express = require("express");
 const amqp = require("amqp");
 const cors = require("cors");
 const WebSocket = require("ws");
+const path = require("path");
 
 const app = express();
-app.use(cors());
 
-const wss = new WebSocket.Server({ port: 8082 });
+const server = https.createServer(
+  {
+    cert: fs.readFileSync("cert.pem"),
+    key: fs.readFileSync("key.pem"),
+  },
+  app
+);
+
+app.use(cors());
+app.use(express.static(path.join(__dirname, "public")));
+
+const wss = new WebSocket.Server({ server });
 
 function broadcast(msg) {
   wss.clients.forEach((c) => c.readyState === WebSocket.OPEN && c.send(msg));
@@ -41,7 +54,15 @@ async function connectRabbit() {
   }
 }
 
-app.listen(8081, () => {
+app.get("/", (req, res) => {
+  res.sendFile(path.join(__dirname, "public", "index.html"));
+});
+
+app.get("/api/hello", (req, res) => {
+  res.json({ message: "Hola Mundo desde api con dockersql" });
+});
+
+app.listen(8081, "0.0.0.0", () => {
   console.log("Dashboard API en 8081");
   connectRabbit();
 });
