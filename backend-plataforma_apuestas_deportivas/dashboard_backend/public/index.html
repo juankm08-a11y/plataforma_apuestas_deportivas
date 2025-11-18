@@ -10,7 +10,7 @@
 
     <h3>Enviar Cuotas</h3>
     <form id="oddsForm">
-      <select name="match_id" id="matchSelect" required></select>
+      <input type="text" name="match_id" placeholder="ID Partido" required />
       <input type="text" name="team" placeholder="Equipo" required />
       <input
         type="number"
@@ -28,24 +28,15 @@
     <script src="app.js"></script>
     <script>
       const form = document.getElementById("oddsForm");
-      const matchSelect = document.getElementById("matchSelect");
       const matchList = document.getElementById("matchList");
 
       async function cargarPartidos() {
         const resp = await fetch("/api/matches");
         const data = await resp.json();
 
-        matchSelect.innerHTML = "";
         matchList.innerHTML = "";
 
         Object.values(data).forEach((m) => {
-          const opt = document.createElement("option");
-          opt.value = m.match_id;
-          opt.textContent = `${m.teamA || m.teams?.[0]} vs ${
-            m.teamB || m.teams?.[1]
-          }`;
-          matchSelect.appendChild(opt);
-
           const li = document.createElement("li");
           li.textContent = `ID ${m.match_id}: ${m.teamA || m.teams?.[0]} vs ${
             m.teamB || m.teams?.[1]
@@ -59,7 +50,7 @@
 
       form.addEventListener("submit", async (e) => {
         e.preventDefault();
-        const match_id = matchSelect.value;
+        const match_id = form.match_id.value;
         const team = form.team.value;
         const odds = parseFloat(form.odds.value);
 
@@ -71,23 +62,6 @@
 
         form.reset();
       });
-
-      const ws = new WebSocket(`wss://${window.location.hostname}:8082`);
-
-      ws.onmessage = (event) => {
-        const div = document.getElementById("alerts");
-        const p = document.createElement("p");
-        p.textContent = event.data;
-        div.appendChild(p);
-      };
-
-      ws.onopen = () => {
-        console.log("Conectado a WebSocket seguro");
-      };
-
-      ws.onerror = (err) => {
-        console.error("Error en WebSocket:", err);
-      };
     </script>
   </body>
 </html>
