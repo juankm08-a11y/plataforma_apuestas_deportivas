@@ -32,29 +32,54 @@ const RABBITMQ_URL = "amqp://guest:guest@rabbitmq";
 const EXCHANGE = "betting_exchange";
 const ROUTING_KEY = "match.alert";
 
-async function connectRabbit() {
-  try {
-    const connection = amqp.createConnection({ url: RABBITMQ_URL });
+let rabbitConnection = null;
+let rabbitExchange = null;
 
-    connection.on("ready", () => {
-      connection.exchange(
-        EXCHANGE,
-        { type: "direct", durable: false },
-        (exchange) => {
-          connection.queue("", { exclusive: true }, (queue) => {
-            queue.bind(EXCHANGE, ROUTING_KEY);
-            queue.subscribe((msg) => {
-              const alerta = msg.data.toString();
-              console.log(`Alerta WS: ${alerta}`);
-              broadcast(alerta);
+let matches = {};
+
+async function connectRabbit() {
+  return new Promise((resolve, reject) => {
+    try {
+      const connection = amqp.createConnection({ url: RABBITMQ_URL });
+
+      connection.on("ready", () => {
+        connection.exchange(
+          EXCHANGE,
+          { type: "direct", durable: false },
+          (exchange) => {
+            rabbitConnection = connection;
+            rabbitExchange = exchange;
+
+            console.log("Exchange listo: ", EXCHANGE);
+
+            connection.queue("", { exclusive: true }, (queue) => {
+              queue.bind(EXCHANGE, ROUTING_KEY);
+              queue.subscribe((msg) => {
+                const alerta = msg.data.toString();
+                console.log(`Alerta WS: ${alerta}`);
+
+                try {
+                  const data = JSON.parse(alerta);
+                  if (data.match_id) {
+                    matches[data.match_id] = data;
+                  }
+                } catch (e) {}
+                broadcast(alerta);
+              });
             });
-          });
-        }
-      );
-    });
-  } catch (error) {
-    console.error("Error al conectar a RabbitMQ: ", error);
-  }
+            resolve(true);
+          }
+        );
+      });
+      connection.on("error", (err) => {
+        console.error("Error RabbitQM", err);
+        reject(err);
+      });
+    } catch (error) {
+      console.error("Error al conectar a RabbitMQ: ", error);
+      reject(err);
+    }
+  });
 }
 
 const rabbitConn = connectRabbit();
@@ -65,8 +90,14 @@ const rabbitConn = connectRabbit();
 
 app.post("/api/set-odds", (req, res) => {
   const { match_id, team, odds } = req.body;
-  if (!match_id || team || !odds)
+  if (!match_id || !team || !odds === undefined)
     return res.status(400).json({ error: "Faltan datos" });
+
+  if (!rabbitExchange) {
+    return res
+      .status(503)
+      .json({ error: "RabbitMQ no está listo aún, intenta en 2 segundos" });
+  }
 
   const msg = JSON.stringify({
     match_id,
@@ -75,16 +106,14 @@ app.post("/api/set-odds", (req, res) => {
     event_type: "ODDS_UPDATED",
   });
 
-  rabbitConn.exchange(
-    EXCHANGE,
-    { key: "topic", durable: false },
-    (exchange) => {
-      exchange.publish(ROUTING_KEY, msg);
-    }
-  );
-
+  rabbitExchange.publish(ROUTING_KEY, msg);
   console.log("Cuota enviada: ", msg);
+
   res.json({ status: "ok", data: msg });
+});
+
+app.get("/api/matches", (req, res) => {
+  res.json(matches);
 });
 
 app.get("/", (req, res) => {

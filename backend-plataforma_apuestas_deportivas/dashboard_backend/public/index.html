@@ -1,21 +1,45 @@
 <!DOCTYPE html>
-<html lang="es">
+<html>
   <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Plataforma de Apuestas Deportivas</title>
+    <title>Dashboard Apuestas</title>
     <link rel="stylesheet" href="styles.css" />
   </head>
   <body>
-    <header>
-      <h1>Dashboard de Apuestas</h1>
-      <p class="subtitle">Alertas en vivo de los partidos</p>
-    </header>
+    <h2>Alertas en vivo</h2>
 
-    <main>
-      <div id="alerts" class="alerts-container"></div>
-    </main>
+    <div id="alerts"></div>
+
+    <h3>Enviar Cuotas</h3>
+    <form id="oddsForm">
+      <input type="text" name="match_id" placeholder="ID Partido" required />
+      <input type="text" name="team" placeholder="Equipo" required />
+      <input
+        type="number"
+        name="odds"
+        placeholder="Cuota"
+        step="0.01"
+        required
+      />
+      <button type="submit">Enviar</button>
+    </form>
 
     <script src="app.js"></script>
+    <script>
+      const form = document.getElementById("oddsForm");
+      form.addEventListener("submit", async (e) => {
+        e.preventDefault();
+        const match_id = form.match_id.value;
+        const team = form.team.value;
+        const odds = parseFloat(form.odds.value);
+
+        await fetch("/api/set-odds", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ match_id, team, odds }),
+        });
+
+        form.reset();
+      });
+    </script>
   </body>
 </html>
