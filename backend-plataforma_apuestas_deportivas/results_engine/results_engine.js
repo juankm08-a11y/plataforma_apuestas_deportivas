@@ -19,8 +19,12 @@ async function run() {
           queue.bind(EXCHANGE, ROUTING_KEY);
 
           queue.subscribe((message) => {
-            const msg = message.data.toString();
-            console.log("Mensaje recibido:", msg);
+            try {
+              const msg = message.data.toString();
+              console.log("Mensaje recibido:", msg);
+            } catch (error) {
+              console.error("Error procesando mensaje: ",e);
+            }
           });
         });
 

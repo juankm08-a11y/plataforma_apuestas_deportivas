@@ -55,36 +55,41 @@ async function connectRabbit() {
             connection.queue("", { exclusive: true }, (queue) => {
               queue.bind(EXCHANGE, ROUTING_KEY);
               queue.subscribe((msg) => {
-                const alerta = msg.data.toString();
-                console.log(`Alerta WS: ${alerta}`);
+                const alertaRaw = msg.data.toString();
+                console.log(`Alerta WS: ${alertaRaw}`);
+
+                let data = null;
+                
 
                 try {
-                  const data = JSON.parse(alerta);
-                  if (data.match_id) {
-                    if (data.teamA && data.teamB) {
-                      matches[data.match_id] = data;
-                    } else if (data.teams && data.teams.length === 2) {
-                      matches[data.match_id] = {
-                        ...data,
-                        teamA: data.teams[0],
-                        teamB: data.teams[1],
-                      };
-                    } else {
-                      matches[data.match_id] = {
-                        ...data,
-                        teamA: data.teams?.[0] || "Equipo1",
-                        teamB: data.teams?.[0] || "Equipo2",
-                      };
-                    }
-
-                    if (data.event_type === "ODDS_UPDATED") {
-                      matches[data.match_id].odds = matches[data.match_id].odds || {};
-                      matches[data.match_id].odda[data.team] = data.odds;
-                    }
-                  }
+                   data = JSON.parse(alertaRaw);
                 } catch (e) {
                   console.error("error parseando alerta: ", e);
+                  return;
                 }
+
+                if (!data.match_id) {
+                  broadcast(alertaRaw);
+                  return;
+                }
+
+                if (data.event_type === "MATCH_CREATED") {
+                  matches[data.match_id] = {
+                    match_id: data.match_id,
+                    teams: data.teams,
+                    teamA: data.teams[0],
+                    teamB: data.timestamp,
+                    odds: {A:1.5,B:1.5}
+                  }
+                }
+
+                if (data.event_type === "MATCH_FINISHED") {
+                  if (!matches[data.match_id]) {
+                    matches[data.match_id] = {}
+                  }
+                  matches[data.match_id].result = data.result;
+                }
+
                 broadcast(alerta);
               });
             });
