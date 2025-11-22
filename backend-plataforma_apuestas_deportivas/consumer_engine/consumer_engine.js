@@ -46,7 +46,7 @@ async function start() {
                                 case "MATCH_CREATED":
                                     alertMsg = {
                                         event_type: "MATCH_CREATED",
-                                        match_id: event.match_id,
+                                        match_id: event.matchId,
                                         teams: event.teams,
                                         timestamp: event.timestamp,
                                         odds: { A: 1.5, B: 1.5 }
@@ -56,7 +56,7 @@ async function start() {
                                 case "MATCH_FINISHED":
                                     alertMsg = {
                                         event_type: "MATCH_FINISHED",
-                                        match_id: event.match_id,
+                                        match_id: event.matchId,
                                         teams: event.teams,
                                         timestamp: event.timestamp,
                                         result: event.result || "PENDING"
@@ -66,7 +66,7 @@ async function start() {
                                 case "ODDS_UPDATED":
                                     alertMsg = {
                                         event_type: "ODDS_UPDATED",
-                                        match_id: event.match_id,
+                                        match_id: event.matchId,
                                         team: event.team,
                                         odds: event.odds
                                     };
@@ -88,4 +88,6 @@ async function start() {
     });
 }
 
-start();
+start().catch((err) => {
+    console.error("Error iniciando consumer engine:",err)
+})
