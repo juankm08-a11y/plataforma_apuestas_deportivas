@@ -1,6 +1,6 @@
 FROM node:18
 
-WORKDIR /app/match_generator
+WORKDIR /app
 
 COPY package.json package-lock.json ./
 
@@ -8,4 +8,4 @@ RUN npm install
 
 COPY . .+
 
-CMD ["node","match_generator/match_generator.js"]
+CMD ["node","match_generator.js"]
