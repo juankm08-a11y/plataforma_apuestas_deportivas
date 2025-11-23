@@ -12,6 +12,7 @@
   "type": "commonjs",
   "dependencies": {
     "amqp": "^0.2.7",
-    "kafka": "^0.2.3"
+    "kafka": "^0.2.3",
+    "kafkajs": "^2.2.4"
   }
 }
