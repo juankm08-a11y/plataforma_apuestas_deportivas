@@ -34,13 +34,11 @@ async function start() {
     connection.on("ready", () => {
         console.log("RabbitMQ conectado:", RABBITMQ_URL);
 
-        connection.exchange(
-            DELAY_EXCHANGE,
-            {type:"direct",durable:true},
-            (exchange) => {
-                console.log(`Exchange asegurado: ${DELAY_EXCHANGE}`);
-            }
-        )
+      connection.exchange(
+    DELAY_EXCHANGE,
+    { type: "direct", durable: true },
+    (exchange) => {
+        console.log(`Exchange asegurado: ${DELAY_EXCHANGE}`);
 
         connection.queue(
             QUEUE_NAME,
@@ -50,14 +48,13 @@ async function start() {
 
                 queue.bind(DELAY_EXCHANGE, DELAY_ROUTING_KEY);
                 console.log(
-                    `Cola enlazada a ${DELAY_EXCHANGE} con routing key ${DELAY_ROUTING_KEY}`
+                    `Cola enlazada a ${DELAY_EXCHANGE} con routing key ${DELAYER_ROUTING_KEY}`
                 );
 
-                queue.subscribe(async (msg, headers, info) => {
+                queue.subscribe(async (msg) => {
                     try {
                         const data = JSON.parse(msg.data.toString());
-
-                        console.log("Mensaje recibido en match_simulator", data);
+                        console.log("Mensaje recibido:", data);
 
                         const finishedMsg = {
                             event_type: "MATCH_FINISHED",
@@ -76,14 +73,17 @@ async function start() {
                             ]
                         });
 
-                        console.log("MATCH_FINISHED enviado a Kafka:", finishedMsg);
+                        console.log("MATCH_FINISHED enviado:", finishedMsg);
 
                     } catch (err) {
                         console.error("Error procesando mensaje:", err);
                     }
                 });
-            }
-        );
+            });
+        }
+    );
+
+
     });
 
     process.on("SIGINT", async () => {
