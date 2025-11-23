@@ -34,6 +34,14 @@ async function start() {
     connection.on("ready", () => {
         console.log("RabbitMQ conectado:", RABBITMQ_URL);
 
+        connection.exchange(
+            DELAY_EXCHANGE,
+            {type:"direct",durable:true},
+            (exchange) => {
+                console.log(`Exchange asegurado: ${DELAY_EXCHANGE}`);
+            }
+        )
+
         connection.queue(
             QUEUE_NAME,
             { durable: true, autoDelete: false },
