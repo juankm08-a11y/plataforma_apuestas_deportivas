@@ -1,10 +1,10 @@
 FROM node:18
 
-WORKDIR /app/email_worker
+WORKDIR /app
 
 COPY package.json package-lock.json ./
 RUN npm install 
 
 COPY . .
 
-CMD ["node", "email_worker/email_worker.js"]
+CMD ["node", "email_worker.js"]
