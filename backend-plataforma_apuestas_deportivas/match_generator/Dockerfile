@@ -1,6 +1,6 @@
 FROM node:18
 
-WORKDIR /app
+WORKDIR /app/match_generator
 
 COPY package.json package-lock.json ./
 
