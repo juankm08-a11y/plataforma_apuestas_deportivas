@@ -13,7 +13,6 @@
   "dependencies": {
     "amqp": "^0.2.7",
     "express": "^5.1.0",
-    "kafkajs": "^2.2.4",
-    "mysql2": "^3.15.3"
+    "kafkajs": "^2.2.4"
   }
 }

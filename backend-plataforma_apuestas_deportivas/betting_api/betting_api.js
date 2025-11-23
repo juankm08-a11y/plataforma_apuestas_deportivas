@@ -1,7 +1,6 @@
 const { Kafka } = require("kafkajs");
 const amqp = require("amqp");
 const express = require("express");
-const mysql = require("mysql2/promise");
 const app = express();
 
 app.use(express.json());
@@ -13,29 +12,9 @@ const kafka = new Kafka({
 
 const producer = kafka.producer();
 
-let db;
-async function initDB() {
-  db = await mysql.createPool({
-    host: "mysql",
-    user: "root",
-    password: "juan03",
-    database: "apuestas_deportivas",
-  });
 
-  await db.query(
-    `
-    CREATE TABLE IF NOT EXISTS odds_history (
-      id INT AUTO_INCREMENT PRIMARY KEY, 
-      match_id VARCHAR(50), 
-      odds DECIMAL (5,2),
-      timestamp DATETIME DEFAULT NOW()
-    )`
-  );
 
-  console.log("Conectado correctamente a MySQL");
-}
-
-const RABBITMQ_URL = "amqp://guest:guest@rabbitMQ";
+const RABBITMQ_URL = "amqp://guest:guest@rabbitmq";
 const EXCHANGE = "betting_exchange";
 const ROUTING_KEY = "match.alert";
 
@@ -64,7 +43,6 @@ async function connectRabbit() {
 
 async function init() {
   await producer.connect();
-  await initDB();
   await connectRabbit();
 
   console.log("Api lista");
@@ -82,11 +60,6 @@ app.post("/odds", async (req, res) => {
     topic: "bettings_events",
     messages: [{ key: matchId, value: JSON.stringify({ matchId, newOdds }) }],
   });
-
-  await db.query("INSERT INTO odds_history (match_id,odds) VALUES (?,?)", [
-    matchId,
-    newOdds,
-  ]);
 
   await producer.send({
     topic: "bettings_events",
