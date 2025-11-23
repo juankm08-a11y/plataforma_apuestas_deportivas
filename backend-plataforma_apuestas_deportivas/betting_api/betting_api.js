@@ -12,8 +12,6 @@ const kafka = new Kafka({
 
 const producer = kafka.producer();
 
-
-
 const RABBITMQ_URL = "amqp://guest:guest@rabbitmq";
 const EXCHANGE = "betting_exchange";
 const ROUTING_KEY = "match.alert";
@@ -44,7 +42,6 @@ async function connectRabbit() {
 async function init() {
   await producer.connect();
   await connectRabbit();
-
   console.log("Api lista");
 }
 
@@ -53,17 +50,13 @@ init();
 app.post("/odds", async (req, res) => {
   const { matchId, newOdds } = req.body;
 
-  if (!matchId || !newOdds)
+  if (!matchId || !newOdds) {
     return res.status(400).json({ error: "Datos incompletos" });
+  }
 
   await producer.send({
     topic: "bettings_events",
     messages: [{ key: matchId, value: JSON.stringify({ matchId, newOdds }) }],
-  });
-
-  await producer.send({
-    topic: "bettings_events",
-    messages: [{ key: matchId, value: JSON.stringify({ Math, newOdds }) }],
   });
 
   if (exchangeGlobal) {
