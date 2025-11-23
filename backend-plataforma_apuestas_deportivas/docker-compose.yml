@@ -22,11 +22,16 @@ services:
       KAFKA_ZOOKEEPER_CONNECT: zookeeper:2181
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT
       KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092
-      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://localhost:9092
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
       KAFKA_CREATE_TOPICS: "match_events:1:1,match_results:1:1,bettings_events:1:1"
     ports:
       - "9092:9092"
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z localhost 9092"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
 
   rabbitmq:
     image: rabbitmq:3-management
@@ -46,9 +51,10 @@ services:
     build: ./betting_api
     command: node betting_api.js
     depends_on:
-      - kafka
-      - rabbitmq
-   
+      kafka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
     ports:
       - "8080:8080"
 
@@ -56,31 +62,36 @@ services:
     build: ./dashboard_backend
     command: node dashboard_backend.js
     depends_on:
-      - rabbitmq
+      rabbitmq:
+        condition: service_healthy
     environment:
       RABBITMQ_URL: amqp://guest:guest@rabbitmq
     ports:
       - "8081:8081"
       - "8082:8082"
 
-  match_generator: 
-   build: ./match_generator
-   container_name: match_generator
-   environment: 
-    - KAFKA_BROKER: kafka:9092
-    - RABBITMQ_URL: amqp://guest:guest@rabbitmq
-    - MATCH_DURATION_MS: 300000
-    - CREATE_INTERVAL_MS: 10000
-  depends_on: 
-    - kafka 
-    - rabbitmq
+  match_generator:
+    build: ./match_generator
+    container_name: match_generator.js
+    environment:
+      KAFKA_BROKER: kafka:9092
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq
+      MATCH_DURATION_MS: 300000
+      CREATE_INTERVAL_MS: 10000
+    depends_on:
+      kafka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
 
-match_simulator: 
- build: ./match_simulator
- container_name: match_simulator
- environment: 
-  - KAFKA_BROKER: kafka:9092
-  - RABBITMQ_URL: amqp://guest:guest@rabbitmq
- depends_on: 
-  - kafka
-  - rabbitmq
+  match_simulator:
+    build: ./match_simulator
+    container_name: match_simulator.js
+    environment:
+      KAFKA_BROKER: kafka:9092
+      RABBITMQ_URL: amqp://guest:guest@rabbitmq
+    depends_on:
+      kafka:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
