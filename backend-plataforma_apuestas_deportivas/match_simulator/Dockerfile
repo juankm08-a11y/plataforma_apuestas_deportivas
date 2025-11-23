@@ -7,4 +7,4 @@ RUN npm install
 
 COPY . .
 
-CMD ["node", "match_simulator.js"]
+CMD ["node", "match_simulator/match_simulator.js"]

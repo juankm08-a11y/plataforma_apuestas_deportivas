@@ -30,20 +30,7 @@
       const form = document.getElementById("oddsForm");
       const matchList = document.getElementById("matchList");
       const alertsDiv = document.getElementById("alerts");
-
-      try {
-        const ws = new WebSocket("wss://localhost:3002")
-        ws.onmessage = (msg) => {
-          const data = JSON.parse(msg.data)
-
-          const p = document.createElement("p");
-          p.textContent = ` ${data.message}`;
-          alertsDiv.prepend(p)
-        };
-      } catch (err) {
-        console.log("WS no disponible aun")
-      }
-
+      
       async function cargarPartidos() {
         const resp = await fetch("/api/matches");
         const data = await resp.json();
