@@ -2,7 +2,7 @@
   "name": "dashboard_backend",
   "version": "1.0.0",
   "description": "",
-  "main": "dashboard_backend.js",
+  "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -11,12 +11,7 @@
   "license": "ISC",
   "type": "commonjs",
   "dependencies": {
-    "amqp": "^0.2.7",
-    "cors": "^2.8.5",
-    "express": "^5.1.0",
-    "fs": "^0.0.1-security",
-    "https": "^1.0.0",
-    "path": "^0.12.7",
+    "amqplib": "^0.10.9",
     "ws": "^8.18.3"
   }
 }

@@ -1,10 +1,10 @@
-FROM node:18
+FROM node:18-alpine
 
-WORKDIR /app/dashboard_backend
+WORKDIR /app
 
-COPY package.json package-lock.json ./
+COPY package*.json ./
 RUN npm install 
 
 COPY . .
-
-CMD ["node", "dashboard_backend/dashboard_backend.js"]
+EXPOSE 3000
+CMD ["node", "index.js"]

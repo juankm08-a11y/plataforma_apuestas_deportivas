@@ -1,0 +1,134 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+  color: #e0e0e0;
+  min-height: 100vh;
+  line-height: 1.6;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 20px;
+}
+
+header {
+  text-align: center;
+  margin-bottom: 40px;
+  padding: 30px 0;
+}
+
+h1 {
+  font-size: 3.5rem;
+  color: #00ff88;
+  text-shadow: 0 0 20px rgba(0, 255, 136, 0.5);
+  margin-bottom: 10px;
+}
+
+.subtitle {
+  font-size: 1.3rem;
+  color: #00cc66;
+}
+
+h2 {
+  color: #00ff88;
+  margin: 30px 0 20px;
+  font-size: 2rem;
+  text-align: center;
+  text-shadow: 0 0 10px rgba(0, 255, 136, 0.3);
+}
+
+.match-card {
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 25px;
+  margin: 20px 0;
+  backdrop-filter: blur(12px);
+  border: 1px solid rgba(0, 255, 136, 0.3);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+  transition: transform 0.3s ease;
+}
+
+.match-card:hover {
+  transform: translateY(-5px);
+}
+
+.match-id {
+  font-size: 0.9rem;
+  color: #888;
+  margin-bottom: 10px;
+}
+
+.teams {
+  font-size: 2.2rem;
+  font-weight: bold;
+  text-align: center;
+  margin: 15px 0;
+  color: #fff;
+}
+
+.vs {
+  color: #00ff88;
+  font-size: 1.8rem;
+  margin: 0 15px;
+}
+
+.bet-buttons {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-top: 20px;
+  flex-wrap: wrap;
+}
+
+.btn-bet {
+  background: linear-gradient(45deg, #00ff88, #00cc66);
+  color: #000;
+  border: none;
+  padding: 14px 28px;
+  font-size: 1.1rem;
+  font-weight: bold;
+  border-radius: 50px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(0, 255, 136, 0.4);
+}
+
+.btn-bet:hover {
+  transform: scale(1.08);
+  background: linear-gradient(45deg, #00cc66, #00ff88);
+  box-shadow: 0 6px 20px rgba(0, 255, 136, 0.6);
+}
+
+.result {
+  text-align: center;
+  margin-top: 20px;
+  padding: 15px;
+  background: rgba(255, 215, 0, 0.2);
+  border-radius: 12px;
+  font-size: 1.8rem;
+  font-weight: bold;
+  color: #ffd700;
+  border: 2px solid #ffd700;
+}
+
+footer {
+  text-align: center;
+  margin-top: 60px;
+  padding: 20px;
+  color: #666;
+  font-size: 0.9rem;
+}
+
+@media (max-width: 768px) {
+  h1 { font-size: 2.5rem; }
+  .teams { font-size: 1.8rem; }
+  .bet-buttons { flex-direction: column; align-items: center; }
+  .btn-bet { width: 80%; }
+}

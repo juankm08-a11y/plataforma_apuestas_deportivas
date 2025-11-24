@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Dashboard Apuestas</title>
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+  <body>
+
+    <div class="container">
+      <header>
+        <h1>BetLive Colombia</h1>
+        <p class="subtitle">Apuestas Deportivas en Tiempo Real</p>
+      </header>
+
+      <main>
+        <section id="open-section">
+          <h2>Partidos ABIERTOS (Apuesta ahora) </h2>
+          <div id="open-matches"></div>
+        </section>
+
+        <section id="live-bets">
+          <h2>Apuestas en Tiempo Real</h2>
+          <div id="results-container"></div>  
+        </section>
+
+        <section id="closed-selection">
+          <h2>Partidos Finalizados</h2>
+          <div id="closed-matches"></div>
+        </section>
+
+        <footer>
+          <p>Proyecto Final - Sistemas Distribuidos  | Juan Carlos Muñoz</p>
+        </footer>
+      </main>
+    </div>
+    <script src="app.js" type="module"></script>
+  </body>
+</html>
